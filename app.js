@@ -9,18 +9,109 @@ nav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classL
 const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}}),{threshold:.08});
 reveals.forEach(el=>observer.observe(el));
 
-// RSVP preview: stores locally until the production database is connected.
+// RSVP: sends responses through the Vercel API route to Google Sheets.
 const rsvpForm=document.querySelector('#rsvp-form');
 const attendingFields=document.querySelector('#attending-fields');
 const rsvpSuccess=document.querySelector('#rsvp-success');
 const editRsvp=document.querySelector('#rsvp-edit');
-const setAttendanceFields=()=>{const v=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;if(attendingFields) attendingFields.hidden=v==='no';};
-rsvpForm?.querySelectorAll('input[name="attending"]').forEach(el=>el.addEventListener('change',setAttendanceFields));
-try{const saved=JSON.parse(localStorage.getItem('gr-wedding-rsvp')||'null');if(saved&&rsvpForm){Object.entries(saved).forEach(([k,v])=>{const els=rsvpForm.elements[k];if(!els)return;if(els instanceof RadioNodeList){[...els].forEach(e=>e.checked=e.value===v);}else els.value=v;});setAttendanceFields();}}
-catch(e){}
-rsvpForm?.addEventListener('submit',e=>{e.preventDefault();const data=Object.fromEntries(new FormData(rsvpForm).entries());localStorage.setItem('gr-wedding-rsvp',JSON.stringify(data));rsvpForm.hidden=true;rsvpSuccess.hidden=false;rsvpSuccess.scrollIntoView({behavior:'smooth',block:'center'});});
-editRsvp?.addEventListener('click',()=>{rsvpSuccess.hidden=true;rsvpForm.hidden=false;});
+const rsvpError=document.querySelector('#rsvp-error');
+const rsvpSubmit=document.querySelector('.rsvp-submit');
+const rsvpStorageKey='gr-wedding-rsvp';
+const rsvpIdKey='gr-wedding-rsvp-id';
 
+const makeResponseId=()=>{
+  if(window.crypto?.randomUUID) return window.crypto.randomUUID();
+  return 'rsvp-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
+};
+
+const setAttendanceFields=()=>{
+  const value=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;
+  if(attendingFields) attendingFields.hidden=value==='no';
+};
+
+const resizeTextarea=el=>{
+  if(!el) return;
+  el.style.height='auto';
+  el.style.height=`${Math.max(el.scrollHeight,42)}px`;
+};
+
+document.querySelectorAll('.auto-grow').forEach(el=>{
+  resizeTextarea(el);
+  el.addEventListener('input',()=>resizeTextarea(el));
+});
+
+rsvpForm?.querySelectorAll('input[name="attending"]').forEach(el=>el.addEventListener('change',setAttendanceFields));
+
+try{
+  const saved=JSON.parse(localStorage.getItem(rsvpStorageKey)||'null');
+  if(saved&&rsvpForm){
+    Object.entries(saved).forEach(([key,value])=>{
+      if(key==='responseId') return;
+      const fields=rsvpForm.elements[key];
+      if(!fields) return;
+      if(fields instanceof RadioNodeList){
+        [...fields].forEach(field=>field.checked=field.value===value);
+      }else{
+        fields.value=value;
+      }
+    });
+    setAttendanceFields();
+    rsvpForm.querySelectorAll('.auto-grow').forEach(resizeTextarea);
+  }
+}catch(error){
+  console.warn('Unable to restore saved RSVP form data.',error);
+}
+
+rsvpForm?.addEventListener('submit',async event=>{
+  event.preventDefault();
+  if(rsvpError){ rsvpError.hidden=true; rsvpError.textContent=''; }
+
+  const formData=Object.fromEntries(new FormData(rsvpForm).entries());
+  const responseId=localStorage.getItem(rsvpIdKey)||makeResponseId();
+  const payload={...formData,responseId};
+
+  if(rsvpSubmit){
+    rsvpSubmit.disabled=true;
+    rsvpSubmit.textContent='Sending…';
+  }
+
+  try{
+    const response=await fetch('/api/rsvp',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok||result.success===false){
+      throw new Error(result.error||'We couldn’t save your RSVP. Please try again.');
+    }
+
+    const confirmedId=result.responseId||responseId;
+    localStorage.setItem(rsvpIdKey,confirmedId);
+    localStorage.setItem(rsvpStorageKey,JSON.stringify({...formData,responseId:confirmedId}));
+    rsvpForm.hidden=true;
+    if(rsvpSuccess){
+      rsvpSuccess.hidden=false;
+      rsvpSuccess.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  }catch(error){
+    if(rsvpError){
+      rsvpError.textContent=error.message||'We couldn’t save your RSVP. Please try again.';
+      rsvpError.hidden=false;
+    }
+  }finally{
+    if(rsvpSubmit){
+      rsvpSubmit.disabled=false;
+      rsvpSubmit.textContent='Submit RSVP';
+    }
+  }
+});
+
+editRsvp?.addEventListener('click',()=>{
+  if(rsvpSuccess) rsvpSuccess.hidden=true;
+  if(rsvpForm) rsvpForm.hidden=false;
+  rsvpForm?.querySelectorAll('.auto-grow').forEach(resizeTextarea);
+});
 
 // Horizontal gallery controls. The gallery remains touch/swipe scrollable on mobile.
 const galleryViewport=document.querySelector('.gallery-viewport');

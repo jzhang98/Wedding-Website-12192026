@@ -144,7 +144,7 @@
 <div class="rsvp-intro">
 <p class="eyebrow">Kindly Respond</p>
 <h2 class="display">Will you celebrate with us?</h2>
-<p>Please reply by November 19, 2026. For this design preview, submissions are saved only in this browser so you can test the full experience. We’ll connect it to the live guest database when we deploy.</p>
+<p>Please reply by November 19, 2026. We’re so excited to celebrate with you.</p>
 </div>
 <form class="rsvp-form" id="rsvp-form">
 <div class="form-row two">
@@ -160,13 +160,13 @@
 <label><span>Number attending</span><select name="partySize"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
 <label><span>Plus-one / additional guest names</span><input name="guestNames" placeholder="If included on your invitation"/></label>
 </div>
-<label><span>Dietary restrictions</span><textarea name="dietary" placeholder="Vegetarian, vegan, gluten-free, allergies, etc." rows="3"></textarea></label>
+<label><span>Dietary restrictions</span><textarea class="auto-grow" name="dietary" placeholder="Vegetarian, vegan, gluten-free, allergies, etc." rows="1"></textarea></label>
 </div>
-<label><span>Anything else we should know?</span><textarea name="note" rows="3"></textarea></label>
+<label><span>Anything else we should know?</span><textarea class="auto-grow" name="note" placeholder="Optional" rows="1"></textarea></label>
 <button class="rsvp-submit" type="submit">Submit RSVP</button>
-<p class="rsvp-privacy">Your response will only be used for wedding planning.</p>
+<p class="rsvp-error" id="rsvp-error" role="alert" hidden></p><p class="rsvp-privacy">Your response will only be used for wedding planning.</p>
 </form>
-<div class="rsvp-success" hidden="" id="rsvp-success"><p class="eyebrow">Received</p><h3>Thank you.</h3><p>Your RSVP has been saved in this preview.</p><button id="rsvp-edit" type="button">Edit response</button></div>
+<div class="rsvp-success" hidden="" id="rsvp-success"><p class="eyebrow">Received</p><h3>Thank you.</h3><p>Your RSVP has been received. We can’t wait to celebrate with you.</p><button id="rsvp-edit" type="button">Edit response</button></div>
 </div>
 </section><section class="faq section section-stone" id="faq">
 <div class="section-heading reveal"><p class="eyebrow">Good to Know</p><h2 class="display">Frequently Asked Questions</h2></div>

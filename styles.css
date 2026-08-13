@@ -1036,3 +1036,26 @@ html, body { overflow-x: hidden !important; }
     text-align: center !important;
   }
 }
+
+/* ===== V20 live RSVP + cleaner expanding note fields ===== */
+.rsvp-form textarea.auto-grow{
+  min-height:42px;
+  height:42px;
+  max-height:220px;
+  overflow-y:auto;
+  resize:none;
+  padding:9px 2px 7px;
+  line-height:1.35;
+}
+.rsvp-submit:disabled{
+  opacity:.55;
+  cursor:wait;
+}
+.rsvp-error{
+  margin:12px 0 0;
+  padding:10px 12px;
+  border-left:2px solid #9b625d;
+  color:#784d49;
+  font-size:13px;
+  line-height:1.4;
+}
