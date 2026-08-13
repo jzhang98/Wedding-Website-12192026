@@ -29,3 +29,60 @@ const galleryNext=document.querySelector('.gallery-next');
 const galleryStep=()=>Math.min(window.innerWidth*.72,680);
 galleryPrev?.addEventListener('click',()=>galleryViewport?.scrollBy({left:-galleryStep(),behavior:'smooth'}));
 galleryNext?.addEventListener('click',()=>galleryViewport?.scrollBy({left:galleryStep(),behavior:'smooth'}));
+
+// V17: keep the mobile menu robust after layout changes/resizes.
+if (toggle && nav) {
+  const syncMenuLabel = () => {
+    const open = nav.classList.contains('open');
+    toggle.textContent = open ? 'Close' : 'Menu';
+    toggle.setAttribute('aria-expanded', String(open));
+  };
+  toggle.addEventListener('click', syncMenuLabel);
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', syncMenuLabel));
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 1050) {
+      nav.classList.remove('open');
+      syncMenuLabel();
+    }
+  }, {passive:true});
+}
+
+// V17: slow automatic gallery advance. Pauses while the guest interacts with it.
+if (galleryViewport) {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let galleryTimer;
+  let interactionTimer;
+  let galleryPaused = false;
+  const cardStep = () => {
+    const card = galleryViewport.querySelector('.gallery-card');
+    const track = galleryViewport.querySelector('.gallery-track');
+    if (!card || !track) return Math.min(window.innerWidth * .72, 680);
+    const gap = parseFloat(getComputedStyle(track).gap || '0');
+    return card.getBoundingClientRect().width + gap;
+  };
+  const autoAdvanceGallery = () => {
+    if (galleryPaused || document.hidden) return;
+    const step = cardStep();
+    const max = galleryViewport.scrollWidth - galleryViewport.clientWidth;
+    const next = galleryViewport.scrollLeft + step;
+    galleryViewport.scrollTo({left: next >= max - 8 ? 0 : next, behavior:'smooth'});
+  };
+  const startGallery = () => {
+    if (prefersReducedMotion) return;
+    clearInterval(galleryTimer);
+    galleryTimer = setInterval(autoAdvanceGallery, 5200);
+  };
+  const pauseGalleryTemporarily = () => {
+    galleryPaused = true;
+    clearTimeout(interactionTimer);
+    interactionTimer = setTimeout(() => { galleryPaused = false; }, 7000);
+  };
+  ['pointerdown','touchstart','wheel','keydown'].forEach(evt =>
+    galleryViewport.addEventListener(evt, pauseGalleryTemporarily, {passive: evt !== 'keydown'})
+  );
+  galleryPrev?.addEventListener('click', pauseGalleryTemporarily);
+  galleryNext?.addEventListener('click', pauseGalleryTemporarily);
+  galleryViewport.addEventListener('mouseenter', () => { galleryPaused = true; });
+  galleryViewport.addEventListener('mouseleave', () => { galleryPaused = false; });
+  startGallery();
+}
