@@ -1194,3 +1194,123 @@ html, body { overflow-x: hidden !important; }
   }
   .venue-stack figure{aspect-ratio:4/5}
 }
+
+/* ===== V24 targeted mobile venue-image fix only ===== */
+/* Keep The Setting photography visible and responsive when phones rotate. */
+@media (max-width: 1050px) {
+  .venue-images-v21.reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .venue-images-v21 {
+    width: 100%;
+    max-width: 900px;
+    justify-self: center;
+    align-self: start;
+    grid-template-columns: minmax(0, 1.45fr) minmax(180px, .65fr);
+    gap: 12px;
+  }
+
+  .venue-feature {
+    min-height: 0 !important;
+    aspect-ratio: 16 / 10;
+  }
+
+  .venue-stack {
+    min-height: 0;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .venue-images-v21 figure,
+  .venue-images-v21 img {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .venue-images-v21 img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+@media (max-width: 700px) {
+  .venue-images-v21 {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 9px;
+    margin: 0 auto;
+  }
+
+  .venue-feature {
+    grid-column: 1 / -1;
+    aspect-ratio: 4 / 3;
+  }
+
+  .venue-stack {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+    gap: 9px;
+  }
+
+  .venue-stack figure {
+    aspect-ratio: 4 / 5;
+  }
+}
+
+/* A landscape phone is wider than the portrait breakpoint, so explicitly
+   constrain the collage by aspect ratio instead of a fixed tall height. */
+@media (max-width: 1050px) and (orientation: landscape) {
+  .venue-images-v21 {
+    max-width: min(900px, 100%);
+  }
+
+  .venue-feature {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* ===== V25: mobile Wedding Day micro-polish only ===== */
+@media (max-width: 700px) {
+  #events .timeline article,
+  #events .timeline article:not(:last-child) {
+    min-height: 196px !important;
+    padding: 20px 12px 21px !important;
+  }
+
+  #events .timeline time {
+    margin-bottom: 9px !important;
+  }
+
+  #events .timeline-icon {
+    width: 86px !important;
+    height: 72px !important;
+    margin: 0 auto 8px !important;
+  }
+
+  #events .timeline-icon img {
+    width: 82px !important;
+    height: 68px !important;
+    max-width: 82px !important;
+    max-height: 68px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    opacity: 1 !important;
+    filter: saturate(.92) contrast(1.06) !important;
+  }
+
+  #events .timeline h3 {
+    margin-bottom: 5px !important;
+  }
+
+  #events .timeline p {
+    line-height: 1.42 !important;
+  }
+}
