@@ -10,16 +10,19 @@ module.exports = async function handler(req, res) {
     const data = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
     const firstName = String(data.firstName || '').trim();
     const lastName = String(data.lastName || '').trim();
+    const email = String(data.email || '').trim();
     const attending = String(data.attending || '').trim();
 
-    if (!firstName || !lastName || !['yes', 'no'].includes(attending)) {
-      return res.status(400).json({ success: false, error: 'Please complete your name and attendance response.' });
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!firstName || !lastName || !emailPattern.test(email) || !['yes', 'no'].includes(attending)) {
+      return res.status(400).json({ success: false, error: 'Please complete your name, email, and attendance response.' });
     }
 
     const payload = {
       responseId: String(data.responseId || '').trim(),
       firstName,
       lastName,
+      email,
       attending,
       partySize: attending === 'yes' ? String(data.partySize || '1') : '0',
       guestNames: attending === 'yes' ? String(data.guestNames || '').trim() : '',
