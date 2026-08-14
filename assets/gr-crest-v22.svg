@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" fill="none">
+  <defs>
+    <style>
+      .gold-stroke{stroke:#c8a15d;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+      .blue-stroke{stroke:#8ba0ad;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;fill:none}
+      .blue-fill{fill:#7f93a4}
+      .gold-fill{fill:#c8a15d}
+      .serif{font-family: "Cormorant Garamond", "Baskerville", "Times New Roman", serif; font-style: italic; font-weight:500;}
+    </style>
+  </defs>
+
+  <!-- crown -->
+  <path class="gold-stroke" d="M431 57h38"/>
+  <path class="gold-stroke" d="M432 57l5-24 13 15 13-22 13 22 13-15 5 24"/>
+  <path class="gold-stroke" d="M437 33h52"/>
+  <circle class="gold-fill" cx="450" cy="24" r="3.7"/>
+  <circle class="gold-fill" cx="437" cy="33" r="3.3"/>
+  <circle class="gold-fill" cx="463" cy="33" r="3.3"/>
+  <circle class="gold-fill" cx="476" cy="33" r="3.3"/>
+  <circle class="gold-fill" cx="489" cy="33" r="3.3"/>
+
+  <!-- rings -->
+  <ellipse class="gold-stroke" cx="450" cy="204" rx="122" ry="122"/>
+  <ellipse class="gold-stroke" cx="450" cy="204" rx="104" ry="104" opacity=".7"/>
+
+  <!-- side swashes -->
+  <path class="gold-stroke" d="M324 182c-60-50-134-44-169 18-19 34-15 79 14 113 19 22 44 34 72 38"/>
+  <path class="gold-stroke" d="M576 182c60-50 134-44 169 18 19 34 15 79-14 113-19 22-44 34-72 38"/>
+  <path class="gold-stroke" d="M318 307c-9 29-29 49-57 58"/>
+  <path class="gold-stroke" d="M582 307c9 29 29 49 57 58"/>
+
+  <!-- florals left -->
+  <path class="blue-stroke" d="M311 160c-18 22-31 48-35 78"/>
+  <path class="blue-stroke" d="M297 175c-14-10-29-18-43-21"/>
+  <path class="blue-stroke" d="M289 195c-16-4-31-4-46 0"/>
+  <path class="blue-stroke" d="M281 217c-13 4-27 11-37 19"/>
+  <path class="blue-stroke" d="M302 221c9 11 18 25 23 40"/>
+  <path class="blue-stroke" d="M292 241c-2 18 1 37 8 53"/>
+  <ellipse class="blue-fill" cx="258" cy="153" rx="6" ry="14" transform="rotate(-57 258 153)"/>
+  <ellipse class="blue-fill" cx="245" cy="196" rx="6" ry="13" transform="rotate(-87 245 196)"/>
+  <ellipse class="blue-fill" cx="248" cy="235" rx="6" ry="14" transform="rotate(60 248 235)"/>
+  <ellipse class="blue-fill" cx="317" cy="263" rx="6" ry="14" transform="rotate(-34 317 263)"/>
+  <ellipse class="blue-fill" cx="301" cy="292" rx="6" ry="14" transform="rotate(-10 301 292)"/>
+  <ellipse class="blue-fill" cx="281" cy="175" rx="6" ry="14" transform="rotate(-115 281 175)"/>
+
+  <!-- florals right -->
+  <path class="blue-stroke" d="M589 160c18 22 31 48 35 78"/>
+  <path class="blue-stroke" d="M603 175c14-10 29-18 43-21"/>
+  <path class="blue-stroke" d="M611 195c16-4 31-4 46 0"/>
+  <path class="blue-stroke" d="M619 217c13 4 27 11 37 19"/>
+  <path class="blue-stroke" d="M598 221c-9 11-18 25-23 40"/>
+  <path class="blue-stroke" d="M608 241c2 18-1 37-8 53"/>
+  <ellipse class="blue-fill" cx="642" cy="153" rx="6" ry="14" transform="rotate(57 642 153)"/>
+  <ellipse class="blue-fill" cx="655" cy="196" rx="6" ry="13" transform="rotate(87 655 196)"/>
+  <ellipse class="blue-fill" cx="652" cy="235" rx="6" ry="14" transform="rotate(-60 652 235)"/>
+  <ellipse class="blue-fill" cx="583" cy="263" rx="6" ry="14" transform="rotate(34 583 263)"/>
+  <ellipse class="blue-fill" cx="599" cy="292" rx="6" ry="14" transform="rotate(10 599 292)"/>
+  <ellipse class="blue-fill" cx="619" cy="175" rx="6" ry="14" transform="rotate(115 619 175)"/>
+
+  <!-- bottom ornament -->
+  <path class="gold-stroke" d="M412 320c7 18 20 29 38 33 18-4 31-15 38-33"/>
+  <path class="gold-stroke" d="M420 352c14-3 20-15 30-15 10 0 16 12 30 15"/>
+  <path class="gold-stroke" d="M433 355c0 10 7 18 17 18s17-8 17-18"/>
+
+  <!-- monogram -->
+  <text x="418" y="237" class="blue-fill serif" font-size="105">G</text>
+  <text x="470" y="251" class="blue-fill serif" font-size="110">R</text>
+</svg>
