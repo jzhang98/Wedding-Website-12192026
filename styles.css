@@ -1450,3 +1450,7 @@ html, body { overflow-x: hidden !important; }
     height: clamp(175px, 48vw, 260px) !important;
   }
 }
+
+
+/* V29 RSVP child attendance field */
+.rsvp-form [hidden]{display:none!important}

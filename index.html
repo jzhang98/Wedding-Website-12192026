@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@300;400;500&amp;family=Italiana&amp;display=swap" rel="stylesheet"/>
-<link href="styles.css?v=27" rel="stylesheet"/>
+<link href="styles.css?v=29" rel="stylesheet"/>
 </head>
 <body>
 <header class="site-header" id="top">
@@ -162,9 +162,11 @@
 </div></fieldset>
 <div id="attending-fields">
 <div class="form-row two">
-<label><span>Number attending</span><select name="partySize"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
-<label><span>Plus-one / additional guest names</span><input name="guestNames" placeholder="If included on your invitation"/></label>
+<label><span>Adults attending</span><select name="adultCount"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
+<label><span>Children attending</span><select id="child-count" name="childCount"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
 </div>
+<label hidden id="children-details"><span>Children's names &amp; ages</span><textarea class="auto-grow" name="childrenDetails" placeholder="e.g., Emma — 6, Noah — 3" rows="1"></textarea></label>
+<label><span>Plus-one / additional guest names</span><input name="guestNames" placeholder="If included on your invitation"/></label>
 <label><span>Dietary restrictions</span><textarea class="auto-grow" name="dietary" placeholder="Vegetarian, vegan, gluten-free, allergies, etc." rows="1"></textarea></label>
 </div>
 <label><span>Anything else we should know?</span><textarea class="auto-grow" name="note" placeholder="Optional" rows="1"></textarea></label>
@@ -198,6 +200,6 @@
 <div class="closing-copy reveal"><p>We can’t wait to celebrate with you.</p><h2>George &amp; Rachel</h2><span>12 · 19 · 26</span></div>
 </section></main>
 <footer><a aria-label="Back to top" href="#top">G<span>R</span></a><p>The Olana · Hickory Creek, Texas</p></footer>
-<script src="app.js"></script>
+<script src="app.js?v=29"></script>
 </body>
 </html>

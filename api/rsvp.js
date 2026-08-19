@@ -18,13 +18,28 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Please complete your name, email, and attendance response.' });
     }
 
+    const adults = attending === 'yes' ? Number.parseInt(data.adultCount, 10) : 0;
+    const children = attending === 'yes' ? Number.parseInt(data.childCount || '0', 10) : 0;
+
+    if (attending === 'yes' && (!Number.isInteger(adults) || adults < 1 || adults > 6 || !Number.isInteger(children) || children < 0 || children > 6)) {
+      return res.status(400).json({ success: false, error: 'Please enter a valid adult and child count.' });
+    }
+
+    const childrenDetails = attending === 'yes' && children > 0 ? String(data.childrenDetails || '').trim() : '';
+    if (attending === 'yes' && children > 0 && !childrenDetails) {
+      return res.status(400).json({ success: false, error: "Please add the children's names and ages." });
+    }
+
     const payload = {
       responseId: String(data.responseId || '').trim(),
       firstName,
       lastName,
       email,
       attending,
-      partySize: attending === 'yes' ? String(data.partySize || '1') : '0',
+      partySize: attending === 'yes' ? String(adults + children) : '0',
+      adultCount: String(adults),
+      childCount: String(children),
+      childrenDetails,
       guestNames: attending === 'yes' ? String(data.guestNames || '').trim() : '',
       dietary: attending === 'yes' ? String(data.dietary || '').trim() : '',
       note: String(data.note || '').trim()

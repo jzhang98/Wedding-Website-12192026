@@ -16,6 +16,9 @@ const rsvpSuccess=document.querySelector('#rsvp-success');
 const editRsvp=document.querySelector('#rsvp-edit');
 const rsvpError=document.querySelector('#rsvp-error');
 const rsvpSubmit=document.querySelector('.rsvp-submit');
+const childCount=document.querySelector('#child-count');
+const childrenDetailsWrap=document.querySelector('#children-details');
+const childrenDetailsField=rsvpForm?.elements?.childrenDetails;
 const rsvpStorageKey='gr-wedding-rsvp';
 const rsvpIdKey='gr-wedding-rsvp-id';
 
@@ -24,9 +27,22 @@ const makeResponseId=()=>{
   return 'rsvp-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
 };
 
+const setChildrenFields=()=>{
+  const attending=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;
+  const count=Number(childCount?.value||0);
+  const show=attending==='yes'&&count>0;
+  if(childrenDetailsWrap) childrenDetailsWrap.hidden=!show;
+  if(childrenDetailsField){
+    childrenDetailsField.disabled=!show;
+    childrenDetailsField.required=show;
+    if(show) resizeTextarea(childrenDetailsField);
+  }
+};
+
 const setAttendanceFields=()=>{
   const value=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;
   if(attendingFields) attendingFields.hidden=value==='no';
+  setChildrenFields();
 };
 
 const resizeTextarea=el=>{
@@ -41,6 +57,7 @@ document.querySelectorAll('.auto-grow').forEach(el=>{
 });
 
 rsvpForm?.querySelectorAll('input[name="attending"]').forEach(el=>el.addEventListener('change',setAttendanceFields));
+childCount?.addEventListener('change',setChildrenFields);
 
 try{
   const saved=JSON.parse(localStorage.getItem(rsvpStorageKey)||'null');
