@@ -1454,3 +1454,40 @@ html, body { overflow-x: hidden !important; }
 
 /* V29 RSVP child attendance field */
 .rsvp-form [hidden]{display:none!important}
+
+
+
+
+
+
+/* V32: smaller, simpler header monogram */
+.site-header .monogram{
+  position:absolute;
+  left:18px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  width:68px;
+  height:56px;
+  text-decoration:none;
+  overflow:visible;
+}
+.site-header .monogram img{
+  display:block;
+  width:54px;
+  height:auto;
+  filter:brightness(0) invert(1);
+  transition:filter .3s ease, transform .3s ease;
+  transform-origin:left center;
+}
+.site-header.scrolled .monogram img{
+  filter:none;
+}
+@media(max-width:1050px){
+  .site-header .monogram{left:14px;width:60px;height:50px}
+  .site-header .monogram img{width:46px}
+}
+@media(max-width:640px){
+  .site-header .monogram{left:12px;width:56px;height:46px}
+  .site-header .monogram img{width:42px}
+}
