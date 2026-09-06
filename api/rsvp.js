@@ -30,6 +30,11 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ success: false, error: "Please add the children's names and ages." });
     }
 
+    const mealChoice = attending === 'yes' ? String(data.mealChoice || '').trim() : '';
+    if (attending === 'yes' && !['Steak', 'Fish'].includes(mealChoice)) {
+      return res.status(400).json({ success: false, error: 'Please choose Steak or Fish for your dinner entrée.' });
+    }
+
     const payload = {
       responseId: String(data.responseId || '').trim(),
       firstName,
@@ -40,6 +45,7 @@ module.exports = async function handler(req, res) {
       adultCount: String(adults),
       childCount: String(children),
       childrenDetails,
+      mealChoice,
       guestNames: attending === 'yes' ? String(data.guestNames || '').trim() : '',
       dietary: attending === 'yes' ? String(data.dietary || '').trim() : '',
       note: String(data.note || '').trim()

@@ -16,11 +16,39 @@ const rsvpSuccess=document.querySelector('#rsvp-success');
 const editRsvp=document.querySelector('#rsvp-edit');
 const rsvpError=document.querySelector('#rsvp-error');
 const rsvpSubmit=document.querySelector('.rsvp-submit');
+const rsvpContinue=document.querySelector('#rsvp-continue');
+const rsvpBack=document.querySelector('#rsvp-back');
+const rsvpPanels=[...document.querySelectorAll('[data-rsvp-step]')];
+const rsvpProgress=[...document.querySelectorAll('[data-rsvp-progress]')];
+const mealChoices=[...document.querySelectorAll('input[name="mealChoice"]')];
 const childCount=document.querySelector('#child-count');
 const childrenDetailsWrap=document.querySelector('#children-details');
 const childrenDetailsField=rsvpForm?.elements?.childrenDetails;
 const rsvpStorageKey='gr-wedding-rsvp';
 const rsvpIdKey='gr-wedding-rsvp-id';
+
+const rsvpStage=document.querySelector('#rsvp-stage');
+const rsvpEnvelope=document.querySelector('#rsvp-envelope');
+
+const openRsvp=()=>{
+  if(rsvpStage) rsvpStage.classList.add('is-open');
+  if(rsvpEnvelope) rsvpEnvelope.setAttribute('aria-expanded','true');
+  if(rsvpForm) rsvpForm.hidden=false;
+};
+
+const closeRsvpEnvelope=()=>{
+  if(rsvpStage) rsvpStage.classList.remove('is-open');
+  if(rsvpEnvelope) rsvpEnvelope.setAttribute('aria-expanded','false');
+  if(rsvpForm) rsvpForm.hidden=true;
+};
+
+rsvpEnvelope?.addEventListener('click',()=>{
+  openRsvp();
+  showRsvpStep(1);
+  setAttendanceFields();
+  requestAnimationFrame(()=>rsvpForm?.scrollIntoView({behavior:'smooth',block:'center'}));
+});
+
 
 const makeResponseId=()=>{
   if(window.crypto?.randomUUID) return window.crypto.randomUUID();
@@ -41,8 +69,28 @@ const setChildrenFields=()=>{
 
 const setAttendanceFields=()=>{
   const value=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;
-  if(attendingFields) attendingFields.hidden=value==='no';
+  const attendingYes=value==='yes';
+  if(attendingFields) attendingFields.hidden=!attendingYes;
+  mealChoices.forEach(field=>{field.disabled=!attendingYes;field.required=attendingYes;});
   setChildrenFields();
+};
+
+const showRsvpStep=step=>{
+  rsvpPanels.forEach(panel=>{panel.hidden=Number(panel.dataset.rsvpStep)!==step;});
+  rsvpProgress.forEach(marker=>{
+    const markerStep=Number(marker.dataset.rsvpProgress);
+    marker.classList.toggle('active',markerStep===step);
+    marker.classList.toggle('complete',markerStep<step);
+  });
+};
+
+const validateRsvpStepOne=()=>{
+  const firstPanel=rsvpPanels.find(panel=>Number(panel.dataset.rsvpStep)===1);
+  if(!firstPanel) return true;
+  const controls=[...firstPanel.querySelectorAll('input,select,textarea')];
+  const invalid=controls.find(control=>!control.checkValidity());
+  if(invalid){invalid.reportValidity();invalid.focus({preventScroll:true});return false;}
+  return true;
 };
 
 const resizeTextarea=el=>{
@@ -59,6 +107,18 @@ document.querySelectorAll('.auto-grow').forEach(el=>{
 rsvpForm?.querySelectorAll('input[name="attending"]').forEach(el=>el.addEventListener('change',setAttendanceFields));
 childCount?.addEventListener('change',setChildrenFields);
 
+rsvpContinue?.addEventListener('click',()=>{
+  if(!validateRsvpStepOne()) return;
+  setAttendanceFields();
+  showRsvpStep(2);
+  rsvpForm?.scrollIntoView({behavior:'smooth',block:'center'});
+});
+
+rsvpBack?.addEventListener('click',()=>{
+  showRsvpStep(1);
+  rsvpForm?.scrollIntoView({behavior:'smooth',block:'center'});
+});
+
 try{
   const saved=JSON.parse(localStorage.getItem(rsvpStorageKey)||'null');
   if(saved&&rsvpForm){
@@ -72,6 +132,7 @@ try{
         fields.value=value;
       }
     });
+    openRsvp();
     setAttendanceFields();
     rsvpForm.querySelectorAll('.auto-grow').forEach(resizeTextarea);
   }
@@ -79,8 +140,17 @@ try{
   console.warn('Unable to restore saved RSVP form data.',error);
 }
 
+showRsvpStep(1);
+setAttendanceFields();
+if(rsvpForm) rsvpForm.hidden = !rsvpStage?.classList.contains('is-open');
+
 rsvpForm?.addEventListener('submit',async event=>{
   event.preventDefault();
+  const secondPanel=rsvpPanels.find(panel=>Number(panel.dataset.rsvpStep)===2);
+  if(secondPanel?.hidden){
+    if(validateRsvpStepOne()){setAttendanceFields();showRsvpStep(2);}
+    return;
+  }
   if(rsvpError){ rsvpError.hidden=true; rsvpError.textContent=''; }
 
   const formData=Object.fromEntries(new FormData(rsvpForm).entries());
@@ -106,6 +176,7 @@ rsvpForm?.addEventListener('submit',async event=>{
     const confirmedId=result.responseId||responseId;
     localStorage.setItem(rsvpIdKey,confirmedId);
     localStorage.setItem(rsvpStorageKey,JSON.stringify({...formData,responseId:confirmedId}));
+    openRsvp();
     rsvpForm.hidden=true;
     if(rsvpSuccess){
       rsvpSuccess.hidden=false;
@@ -125,8 +196,11 @@ rsvpForm?.addEventListener('submit',async event=>{
 });
 
 editRsvp?.addEventListener('click',()=>{
+  openRsvp();
   if(rsvpSuccess) rsvpSuccess.hidden=true;
   if(rsvpForm) rsvpForm.hidden=false;
+  showRsvpStep(1);
+  setAttendanceFields();
   rsvpForm?.querySelectorAll('.auto-grow').forEach(resizeTextarea);
 });
 

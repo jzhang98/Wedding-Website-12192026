@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@300;400;500&amp;family=Italiana&amp;display=swap" rel="stylesheet"/>
-<link href="styles.css?v=32" rel="stylesheet"/>
+<link href="styles.css?v=36" rel="stylesheet"/>
 </head>
 <body>
 <header class="site-header" id="top">
@@ -150,7 +150,21 @@
 <h2 class="display">Will you celebrate with us?</h2>
 <p>Please reply by October 31, 2026. We’re so excited to celebrate with you.</p>
 </div>
-<form class="rsvp-form" id="rsvp-form">
+<div class="rsvp-stage" id="rsvp-stage">
+<button aria-controls="rsvp-form" aria-expanded="false" class="rsvp-envelope" data-open-rsvp id="rsvp-envelope" type="button">
+<span class="rsvp-envelope-flap" aria-hidden="true"></span>
+<span class="rsvp-envelope-seal" aria-hidden="true">GR</span>
+<span class="rsvp-envelope-copy">
+<strong>Open RSVP</strong>
+<em>Reply by October 31, 2026</em>
+</span>
+</button>
+<form class="rsvp-form rsvp-form-v35" hidden id="rsvp-form">
+<section class="rsvp-panel rsvp-card" data-rsvp-step="1">
+<div class="rsvp-card-header">
+<h3>Your response</h3>
+<span>Personal details and your attendance.</span>
+</div>
 <div class="form-row two">
 <label><span>First name</span><input autocomplete="given-name" name="firstName" required=""/></label>
 <label><span>Last name</span><input autocomplete="family-name" name="lastName" required=""/></label>
@@ -160,20 +174,52 @@
 <label class="choice"><input name="attending" required="" type="radio" value="yes"/><span>Joyfully accepts</span></label>
 <label class="choice"><input name="attending" required="" type="radio" value="no"/><span>Regretfully declines</span></label>
 </div></fieldset>
+<div class="rsvp-step-actions"><button class="rsvp-next" id="rsvp-continue" type="button">Continue to celebration details <span aria-hidden="true">→</span></button></div>
+</section>
+<section class="rsvp-panel rsvp-card" data-rsvp-step="2" hidden>
+<div class="rsvp-card-header">
+<h3>Celebration details</h3>
+<span>Your party, dinner selection, and any notes.</span>
+</div>
 <div id="attending-fields">
-<div class="form-row two">
+<div class="form-row two compact-row">
 <label><span>Adults attending</span><select name="adultCount"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
 <label><span>Children attending</span><select id="child-count" name="childCount"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
 </div>
 <label hidden id="children-details"><span>Children's names &amp; ages</span><textarea class="auto-grow" name="childrenDetails" placeholder="e.g., Emma — 6, Noah — 3" rows="1"></textarea></label>
 <label><span>Plus-one / additional guest names</span><input name="guestNames" placeholder="If included on your invitation"/></label>
+
+<fieldset class="meal-fieldset">
+<legend>Dinner selection</legend>
+<p class="meal-hint">Please choose one entrée. Select an option to view the description.</p>
+<div class="meal-choice-grid">
+<label class="meal-choice">
+<input name="mealChoice" type="radio" value="Steak"/>
+<span class="meal-card">
+<span class="meal-card-heading"><span><strong>Steak</strong></span><i aria-hidden="true">✓</i></span>
+<span class="meal-description">Full-flavored and tender steak, served with a Star Anise Pinot Noir Reduction.</span>
+</span>
+</label>
+<label class="meal-choice">
+<input name="mealChoice" type="radio" value="Fish"/>
+<span class="meal-card">
+<span class="meal-card-heading"><span><strong>Fish</strong></span><i aria-hidden="true">✓</i></span>
+<span class="meal-description">Fresh salmon fillet with jumbo lump crab meat cake, asparagus, and a Tarragon Tomato Béarnaise topping.</span>
+</span>
+</label>
+</div>
+</fieldset>
+
 <label><span>Dietary restrictions</span><textarea class="auto-grow" name="dietary" placeholder="Vegetarian, vegan, gluten-free, allergies, etc." rows="1"></textarea></label>
 </div>
-<label><span>Anything else we should know?</span><textarea class="auto-grow" name="note" placeholder="Optional" rows="1"></textarea></label>
-<button class="rsvp-submit" type="submit">Submit RSVP</button>
+<div class="rsvp-panel-heading rsvp-notes-heading"><p>One last thing</p><span>Anything else you'd like us to know?</span></div>
+<label class="rsvp-note-field"><span>Additional information</span><textarea class="auto-grow" name="note" placeholder="Optional" rows="1"></textarea></label>
+<div class="rsvp-step-actions rsvp-final-actions"><button class="rsvp-back" id="rsvp-back" type="button"><span aria-hidden="true">←</span> Back</button><button class="rsvp-submit" type="submit">Submit RSVP</button></div>
+</section>
 <p class="rsvp-error" id="rsvp-error" role="alert" hidden></p><p class="rsvp-privacy">Your response will only be used for wedding planning.</p>
 </form>
 <div class="rsvp-success" hidden="" id="rsvp-success"><p class="eyebrow">Received</p><h3>Thank you.</h3><p>Your RSVP has been received. We can’t wait to celebrate with you.</p><button id="rsvp-edit" type="button">Edit response</button></div>
+</div>
 </div>
 </section><section class="faq section section-stone" id="faq">
 <div class="section-heading reveal"><p class="eyebrow">Good to Know</p><h2 class="display">Frequently Asked Questions</h2></div>
@@ -189,7 +235,7 @@
 <details><summary>Will there be an open bar?</summary><p>Yes. We’ll have cocktails, wine, beer, and non-alcoholic options throughout the evening.</p></details>
 <details><summary>Can I take photos during the ceremony?</summary><p>Yes. You are welcome to take photos, but please keep it to a minimum so everyone can be present with us.</p></details>
 <details><summary>Is there a wedding registry?</summary><p>Your presence is the greatest gift. If you feel inclined to give, we would deeply appreciate a cash gift toward our honeymoon and future together. A card box will be available at the venue, and Venmo is also available at @RachelJiang99. We will not have a traditional registry.</p></details>
-<details><summary>Can I bring a plus one?</summary><p>Plus ones are welcome only when specifically confirmed with us in advance. If we are not aware of your plus one, we kindly ask that you attend without an additional guest. Thank you for helping us keep our guest list and seating plans accurate.</p></details>
+<details><summary>Can I bring a plus one?</summary><p>Plus ones are welcome only when specifically included on your invitation and confirmed with us in advance. If a plus one is not indicated on your invitation or RSVP, we kindly ask that you attend without an additional guest. Thank you for helping us keep our guest list and seating plans accurate.</p></details>
 <details><summary>Are kids welcome?</summary><p>We truly love and welcome your little ones. As the evening progresses, the celebration will transition into a more formal atmosphere, so please plan according to your family’s comfort.</p></details>
 <details><summary>How can I reach you with questions?</summary><p>George: 832-703-9716 · Rachel: 832-677-2521</p></details>
 </div>
@@ -199,6 +245,6 @@
 <div class="closing-copy reveal"><p>We can’t wait to celebrate with you.</p><h2>George &amp; Rachel</h2><span>12 · 19 · 26</span></div>
 </section></main>
 <footer><a aria-label="Back to top" href="#top">G<span>R</span></a><p>The Olana · Hickory Creek, Texas</p></footer>
-<script src="app.js?v=30"></script>
+<script src="app.js?v=36"></script>
 </body>
 </html>
