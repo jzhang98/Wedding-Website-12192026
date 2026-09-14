@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&amp;family=Inter:wght@300;400;500&amp;family=Italiana&amp;display=swap" rel="stylesheet"/>
-<link href="styles.css?v=36" rel="stylesheet"/>
+<link href="styles.css?v=37" rel="stylesheet"/>
 </head>
 <body>
 <header class="site-header" id="top">
@@ -186,29 +186,15 @@
 <label><span>Adults attending</span><select name="adultCount"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
 <label><span>Children attending</span><select id="child-count" name="childCount"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
 </div>
-<label hidden id="children-details"><span>Children's names &amp; ages</span><textarea class="auto-grow" name="childrenDetails" placeholder="e.g., Emma — 6, Noah — 3" rows="1"></textarea></label>
-<label><span>Plus-one / additional guest names</span><input name="guestNames" placeholder="If included on your invitation"/></label>
-
-<fieldset class="meal-fieldset">
-<legend>Dinner selection</legend>
-<p class="meal-hint">Please choose one entrée. Select an option to view the description.</p>
-<div class="meal-choice-grid">
-<label class="meal-choice">
-<input name="mealChoice" type="radio" value="Steak"/>
-<span class="meal-card">
-<span class="meal-card-heading"><span><strong>Steak</strong></span><i aria-hidden="true">✓</i></span>
-<span class="meal-description">Full-flavored and tender steak, served with a Star Anise Pinot Noir Reduction.</span>
-</span>
-</label>
-<label class="meal-choice">
-<input name="mealChoice" type="radio" value="Fish"/>
-<span class="meal-card">
-<span class="meal-card-heading"><span><strong>Fish</strong></span><i aria-hidden="true">✓</i></span>
-<span class="meal-description">Fresh salmon fillet with jumbo lump crab meat cake, asparagus, and a Tarragon Tomato Béarnaise topping.</span>
-</span>
-</label>
+<div class="guest-dinner-section">
+<div class="rsvp-panel-heading guest-dinner-heading"><p>Guest &amp; dinner selections</p><span>Choose an entrée for each person attending.</span></div>
+<p class="guest-dinner-intro">Add each guest below and select their dinner. Tap Steak or Fish to view its description.</p>
+<div class="guest-meal-list" id="guest-meal-list"></div>
+<input id="guest-names-data" name="guestNames" type="hidden"/>
+<input id="children-details-data" name="childrenDetails" type="hidden"/>
+<input id="primary-meal-data" name="mealChoice" type="hidden"/>
+<input id="meal-selections-data" name="mealSelections" type="hidden"/>
 </div>
-</fieldset>
 
 <label><span>Dietary restrictions</span><textarea class="auto-grow" name="dietary" placeholder="Vegetarian, vegan, gluten-free, allergies, etc." rows="1"></textarea></label>
 </div>
@@ -245,6 +231,6 @@
 <div class="closing-copy reveal"><p>We can’t wait to celebrate with you.</p><h2>George &amp; Rachel</h2><span>12 · 19 · 26</span></div>
 </section></main>
 <footer><a aria-label="Back to top" href="#top">G<span>R</span></a><p>The Olana · Hickory Creek, Texas</p></footer>
-<script src="app.js?v=36"></script>
+<script src="app.js?v=37"></script>
 </body>
 </html>

@@ -30,10 +30,44 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ success: false, error: "Please add the children's names and ages." });
     }
 
-    const mealChoice = attending === 'yes' ? String(data.mealChoice || '').trim() : '';
-    if (attending === 'yes' && !['Steak', 'Fish'].includes(mealChoice)) {
-      return res.status(400).json({ success: false, error: 'Please choose Steak or Fish for your dinner entrée.' });
+    let mealSelections = [];
+    if (attending === 'yes') {
+      try {
+        mealSelections = Array.isArray(data.mealSelections)
+          ? data.mealSelections
+          : JSON.parse(String(data.mealSelections || '[]'));
+      } catch {
+        mealSelections = [];
+      }
+
+      if (!Array.isArray(mealSelections) || mealSelections.length !== adults + children) {
+        return res.status(400).json({ success: false, error: 'Please complete a dinner selection for every guest.' });
+      }
+
+      for (const guest of mealSelections) {
+        const name = String(guest?.name || '').trim();
+        const meal = String(guest?.meal || '').trim();
+        const type = String(guest?.type || '').trim();
+        if (!name || !['adult', 'child'].includes(type) || !['Steak', 'Fish'].includes(meal)) {
+          return res.status(400).json({ success: false, error: 'Please complete each guest name and dinner selection.' });
+        }
+        if (type === 'child' && !String(guest?.age || '').trim()) {
+          return res.status(400).json({ success: false, error: "Please add each child's age." });
+        }
+      }
     }
+
+    const primaryMeal = attending === 'yes'
+      ? String(mealSelections.find(guest => guest?.key === 'primary')?.meal || '').trim()
+      : '';
+
+    const mealSelectionSummary = attending === 'yes'
+      ? mealSelections.map(guest => {
+          const name = String(guest.name || '').trim();
+          const age = guest.type === 'child' && String(guest.age || '').trim() ? ` (${String(guest.age).trim()})` : '';
+          return `${name}${age} — ${String(guest.meal || '').trim()}`;
+        }).join(' | ')
+      : '';
 
     const payload = {
       responseId: String(data.responseId || '').trim(),
@@ -45,7 +79,8 @@ module.exports = async function handler(req, res) {
       adultCount: String(adults),
       childCount: String(children),
       childrenDetails,
-      mealChoice,
+      mealChoice: primaryMeal,
+      mealSelections: mealSelectionSummary,
       guestNames: attending === 'yes' ? String(data.guestNames || '').trim() : '',
       dietary: attending === 'yes' ? String(data.dietary || '').trim() : '',
       note: String(data.note || '').trim()

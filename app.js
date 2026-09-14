@@ -20,10 +20,13 @@ const rsvpContinue=document.querySelector('#rsvp-continue');
 const rsvpBack=document.querySelector('#rsvp-back');
 const rsvpPanels=[...document.querySelectorAll('[data-rsvp-step]')];
 const rsvpProgress=[...document.querySelectorAll('[data-rsvp-progress]')];
-const mealChoices=[...document.querySelectorAll('input[name="mealChoice"]')];
 const childCount=document.querySelector('#child-count');
-const childrenDetailsWrap=document.querySelector('#children-details');
-const childrenDetailsField=rsvpForm?.elements?.childrenDetails;
+const adultCount=document.querySelector('select[name="adultCount"]');
+const guestMealList=document.querySelector('#guest-meal-list');
+const guestNamesData=document.querySelector('#guest-names-data');
+const childrenDetailsData=document.querySelector('#children-details-data');
+const primaryMealData=document.querySelector('#primary-meal-data');
+const mealSelectionsData=document.querySelector('#meal-selections-data');
 const rsvpStorageKey='gr-wedding-rsvp';
 const rsvpIdKey='gr-wedding-rsvp-id';
 
@@ -55,24 +58,125 @@ const makeResponseId=()=>{
   return 'rsvp-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
 };
 
-const setChildrenFields=()=>{
-  const attending=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;
-  const count=Number(childCount?.value||0);
-  const show=attending==='yes'&&count>0;
-  if(childrenDetailsWrap) childrenDetailsWrap.hidden=!show;
-  if(childrenDetailsField){
-    childrenDetailsField.disabled=!show;
-    childrenDetailsField.required=show;
-    if(show) resizeTextarea(childrenDetailsField);
+const STEAK_DESCRIPTION='Full-flavored and tender steak, served with a Star Anise Pinot Noir Reduction.';
+const FISH_DESCRIPTION='Fresh salmon fillet with jumbo lump crab meat cake, asparagus, and a Tarragon Tomato Béarnaise topping.';
+
+let guestRosterState={};
+
+const captureGuestRosterState=()=>{
+  if(!guestMealList) return;
+  guestMealList.querySelectorAll('[data-guest-key]').forEach(card=>{
+    const key=card.dataset.guestKey;
+    const name=card.querySelector('[data-guest-name]')?.value?.trim()||'';
+    const age=card.querySelector('[data-guest-age]')?.value?.trim()||'';
+    const meal=card.querySelector('input[type="radio"]:checked')?.value||'';
+    guestRosterState[key]={name,age,meal};
+  });
+};
+
+const mealOptionMarkup=(key,value,label,description,checked)=>`<label class="guest-meal-option"><input ${checked?'checked ':''}name="meal-${key}" type="radio" value="${value}"/><span><strong>${label}</strong><i aria-hidden="true">✓</i></span><em>${description}</em></label>`;
+
+const renderGuestRoster=(savedSelections=null)=>{
+  if(!guestMealList) return;
+  captureGuestRosterState();
+  if(Array.isArray(savedSelections)){
+    savedSelections.forEach(item=>{
+      if(item?.key) guestRosterState[item.key]={name:item.name||'',age:item.age||'',meal:item.meal||''};
+    });
   }
+
+  const attending=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;
+  if(attending!=='yes'){
+    guestMealList.innerHTML='';
+    syncGuestMealData();
+    return;
+  }
+
+  const adults=Math.max(1,Number(adultCount?.value||1));
+  const children=Math.max(0,Number(childCount?.value||0));
+  const primaryName=[rsvpForm?.elements?.firstName?.value,rsvpForm?.elements?.lastName?.value].filter(Boolean).join(' ').trim()||'Primary guest';
+  const cards=[];
+
+  const primary=guestRosterState.primary||{};
+  cards.push(`<article class="guest-meal-person" data-guest-key="primary" data-guest-type="adult"><div class="guest-meal-person-head"><div><span class="guest-number">Guest 1</span><h4>${escapeHtml(primaryName)}</h4><p>Primary guest</p></div></div><div class="guest-meal-buttons">${mealOptionMarkup('primary','Steak','Steak',STEAK_DESCRIPTION,primary.meal==='Steak')}${mealOptionMarkup('primary','Fish','Fish',FISH_DESCRIPTION,primary.meal==='Fish')}</div></article>`);
+
+  for(let i=2;i<=adults;i++){
+    const key=`adult${i}`;
+    const state=guestRosterState[key]||{};
+    cards.push(`<article class="guest-meal-person" data-guest-key="${key}" data-guest-type="adult"><div class="guest-meal-person-head guest-meal-person-input"><div><span class="guest-number">Adult guest ${i}</span><label><span>Guest name</span><input data-guest-name placeholder="Full name" required value="${escapeAttr(state.name||'')}"/></label></div></div><div class="guest-meal-buttons">${mealOptionMarkup(key,'Steak','Steak',STEAK_DESCRIPTION,state.meal==='Steak')}${mealOptionMarkup(key,'Fish','Fish',FISH_DESCRIPTION,state.meal==='Fish')}</div></article>`);
+  }
+
+  for(let i=1;i<=children;i++){
+    const key=`child${i}`;
+    const state=guestRosterState[key]||{};
+    cards.push(`<article class="guest-meal-person" data-guest-key="${key}" data-guest-type="child"><div class="guest-meal-person-head guest-meal-person-input"><div><span class="guest-number">Child ${i}</span><div class="child-name-age"><label><span>Child's name</span><input data-guest-name placeholder="Name" required value="${escapeAttr(state.name||'')}"/></label><label><span>Age</span><input data-guest-age inputmode="numeric" min="0" max="17" placeholder="Age" required type="number" value="${escapeAttr(state.age||'')}"/></label></div></div></div><div class="guest-meal-buttons">${mealOptionMarkup(key,'Steak','Steak',STEAK_DESCRIPTION,state.meal==='Steak')}${mealOptionMarkup(key,'Fish','Fish',FISH_DESCRIPTION,state.meal==='Fish')}</div></article>`);
+  }
+
+  guestMealList.innerHTML=cards.join('');
+  guestMealList.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',syncGuestMealData));
+  guestMealList.querySelectorAll('[data-guest-name],[data-guest-age]').forEach(el=>el.addEventListener('input',syncGuestMealData));
+  syncGuestMealData();
+};
+
+function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));}
+function escapeAttr(value){return escapeHtml(value);}
+
+const getGuestMealSelections=()=>{
+  if(!guestMealList) return [];
+  const primaryName=[rsvpForm?.elements?.firstName?.value,rsvpForm?.elements?.lastName?.value].filter(Boolean).join(' ').trim()||'Primary guest';
+  return [...guestMealList.querySelectorAll('[data-guest-key]')].map((card,index)=>{
+    const type=card.dataset.guestType||'adult';
+    const key=card.dataset.guestKey;
+    const name=key==='primary'?primaryName:(card.querySelector('[data-guest-name]')?.value?.trim()||'');
+    const age=type==='child'?(card.querySelector('[data-guest-age]')?.value?.trim()||''):'';
+    const meal=card.querySelector('input[type="radio"]:checked')?.value||'';
+    return {key,type,name,age,meal,index:index+1};
+  });
+};
+
+function syncGuestMealData(){
+  const selections=getGuestMealSelections();
+  const adults=selections.filter(item=>item.type==='adult'&&item.key!=='primary');
+  const children=selections.filter(item=>item.type==='child');
+  if(guestNamesData) guestNamesData.value=adults.map(item=>item.name).filter(Boolean).join(', ');
+  if(childrenDetailsData) childrenDetailsData.value=children.map(item=>item.name?`${item.name}${item.age?` — ${item.age}`:''}`:'').filter(Boolean).join(', ');
+  if(primaryMealData) primaryMealData.value=selections.find(item=>item.key==='primary')?.meal||'';
+  if(mealSelectionsData) mealSelectionsData.value=JSON.stringify(selections);
+  captureGuestRosterState();
+}
+
+const validateGuestRoster=()=>{
+  const attending=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;
+  if(attending!=='yes') return true;
+  const selections=getGuestMealSelections();
+  for(const item of selections){
+    const card=guestMealList?.querySelector(`[data-guest-key="${item.key}"]`);
+    if(item.key!=='primary'&&!item.name){
+      const input=card?.querySelector('[data-guest-name]');
+      input?.reportValidity(); input?.focus({preventScroll:true}); return false;
+    }
+    if(item.type==='child'&&!item.age){
+      const input=card?.querySelector('[data-guest-age]');
+      input?.reportValidity(); input?.focus({preventScroll:true}); return false;
+    }
+    if(!['Steak','Fish'].includes(item.meal)){
+      const first=card?.querySelector('input[type="radio"]');
+      first?.setCustomValidity('Please choose Steak or Fish for this guest.');
+      first?.reportValidity();
+      setTimeout(()=>first?.setCustomValidity(''),0);
+      card?.scrollIntoView({behavior:'smooth',block:'center'});
+      return false;
+    }
+  }
+  syncGuestMealData();
+  return true;
 };
 
 const setAttendanceFields=()=>{
   const value=rsvpForm?.querySelector('input[name="attending"]:checked')?.value;
   const attendingYes=value==='yes';
   if(attendingFields) attendingFields.hidden=!attendingYes;
-  mealChoices.forEach(field=>{field.disabled=!attendingYes;field.required=attendingYes;});
-  setChildrenFields();
+  renderGuestRoster();
 };
 
 const showRsvpStep=step=>{
@@ -105,7 +209,10 @@ document.querySelectorAll('.auto-grow').forEach(el=>{
 });
 
 rsvpForm?.querySelectorAll('input[name="attending"]').forEach(el=>el.addEventListener('change',setAttendanceFields));
-childCount?.addEventListener('change',setChildrenFields);
+adultCount?.addEventListener('change',()=>renderGuestRoster());
+childCount?.addEventListener('change',()=>renderGuestRoster());
+rsvpForm?.elements?.firstName?.addEventListener('input',()=>renderGuestRoster());
+rsvpForm?.elements?.lastName?.addEventListener('input',()=>renderGuestRoster());
 
 rsvpContinue?.addEventListener('click',()=>{
   if(!validateRsvpStepOne()) return;
@@ -134,6 +241,9 @@ try{
     });
     openRsvp();
     setAttendanceFields();
+    let savedSelections=[];
+    try{savedSelections=JSON.parse(saved.mealSelections||'[]');}catch(e){}
+    if(Array.isArray(savedSelections)&&savedSelections.length) renderGuestRoster(savedSelections);
     rsvpForm.querySelectorAll('.auto-grow').forEach(resizeTextarea);
   }
 }catch(error){
@@ -152,6 +262,8 @@ rsvpForm?.addEventListener('submit',async event=>{
     return;
   }
   if(rsvpError){ rsvpError.hidden=true; rsvpError.textContent=''; }
+  if(!validateGuestRoster()) return;
+  syncGuestMealData();
 
   const formData=Object.fromEntries(new FormData(rsvpForm).entries());
   const responseId=localStorage.getItem(rsvpIdKey)||makeResponseId();
